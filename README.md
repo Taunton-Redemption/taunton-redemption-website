@@ -3,7 +3,7 @@
 One page, no build step. Files:
 
 - `index.html`: the page
-- `site-data.js`: **everything that changes** (hours, phone, closure override, deposit lists, rules, verified date)
+- `site-data.js`: **everything that changes** (hours, phone, closures, deposit lists, rules, verified date)
 - `status.js`: the open/closed logic
 - `status.test.js`: tests for that logic (`node status.test.js`)
 - `CONTEXT.md`: the project glossary
@@ -12,12 +12,18 @@ One page, no build step. Files:
 1. In `site-data.js`, set the real `phone` and `hours`, then change `hoursArePlaceholder` to `false`.
 2. Check the deposit lists against the mass.gov page and update `lastVerified`.
 
-## Closing for an emergency or holiday
-In `site-data.js`, replace `override: null` with, for example:
+## Closures (emergencies, holidays, anything planned)
+In `site-data.js`, add one entry per closure to the `closures` list (dates are YYYY-MM-DD):
 
-    override: { message: "Closed today: power outage", start: "2026-11-27", end: "2026-11-27" },
+    closures: [
+      { start: "2026-11-26", end: "2026-11-26", message: "Closed for Thanksgiving" },
+      { start: "2026-12-01", end: "2026-12-02", message: "Closed for inventory" }
+    ],
 
-Commit the change. The site updates in a minute or two. After the end date it returns to normal hours by itself. To end it early, set it back to `null`.
+- A closure shows in the "Upcoming closures" strip from 14 days before it starts (change `closureNoticeDays` to adjust) until its last day is over, then it disappears by itself. You can leave old entries in or delete them.
+- On the closure days, the banner says "Closed" with the message, and the shop reopens by itself afterward.
+- For an emergency today, add `{ message: "Closed today: power outage", start: "2026-11-27", end: "2026-11-27" }`. With no `end`, the shop stays closed until you remove the entry.
+- Commit the change. The site updates in a minute or two.
 
 ## Publishing on GitHub Pages
 1. Create the repo under the client’s account, named `<username>.github.io`.

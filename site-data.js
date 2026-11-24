@@ -30,7 +30,25 @@ const SITE_DATA = {
   //   override: { message: "Closed today: power outage", start: "2026-11-27", end: "2026-11-27" },
   // "start" and "end" are optional. With no "end" it stays closed until you set it back to null.
   // After the end date passes, the site goes back to normal hours by itself.
-  override: null,
+  // override: null,
+
+  // CLOSURES: emergencies, holidays, or anything planned. One entry per closure.
+  // Dates are YYYY-MM-DD. "message" is the reason customers see.
+  // - start and end are optional; with no end, the shop stays closed until you remove the entry.
+  // - A closure shows in the "Upcoming closures" strip 14 days ahead and disappears
+  //   by itself after its last day. The shop reopens by itself after it, too.
+  // Example for a range: { start: "2026-12-01", end: "2026-12-02", message: "Closed for inventory" },
+  closures: [
+    { start: "2026-11-26", end: "2026-11-26", message: "Closed for Thanksgiving" },
+  ],
+
+  // How many days ahead customers see an upcoming closure.
+  closureNoticeDays: 14,
+
+
+
+  // TODO: SHOW EXACT DAY WHEN OPEN AGAIN WITH TIME
+  // TODO: maybe let people know to try to get in before 2:45 since we start cleaning and leave by then?
 
   // Deposit rules.
   depositCents: 5,
@@ -39,26 +57,27 @@ const SITE_DATA = {
 
   depositYes: [
     "Check for the 'MA' stamped on top of the can",
-    "Soda and other carbonated soft drinks (Coke, Pepsi, Polar, etc.)",
+    "Soda and other carbonated soft drinks",
     "Beer and malt beverages, cans and bottles",
-    "Some seltzer and sparkling water"
+    "Sparkling water",
+    "Hard seltzer",
   ],
   depositNo: [
-    "Water bottles (still water)",
+    "Water bottles (Still water)",
     "Juice and iced tea",
     "Sports drinks (Gatorade, Powerade)",
-    "Wine bottles (we don’t take these)",
-    "Liquor bottles and nips (we don’t take these)",
-    "High Noon, Sun Cruiser, Surfside"
+    "Wine bottles",
+    "Liquor bottles and nips",
+    "High Noon, Sun Cruiser, Surfside, Arizona (Non-spiked)"
   ],
 
   // Shop rules, in the order they appear. {cents} is replaced by depositCents.
   rules: [
     "We pay {cents}¢ for every deposit container.",
     "Loose glass bottles of alcoholic drinks: limit of 25 per day. We turn away any beyond 25.",
-    "Bottles still in their original box have no limit.",
+    "Glass bottles still in their original box have no limit.",
     "Keep loose bottles separate from cans and plastic.",
-    "Cans and plastic can share a bag, but separate bags are easier for everyone.",
+    "Cans and plastic can share a bag, but separate bags are appreciated.",
     "Keep trash out of your bags. A bag with a lot of trash will be refused."
   ]
 };

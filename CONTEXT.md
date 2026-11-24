@@ -19,9 +19,12 @@ _Avoid_: Non-returnable
 **Daily bottle limit**:
 The most loose deposit glass bottles of alcoholic drinks the shop accepts from one customer per day (25). Bottles in their original boxes are exempt.
 
-**Closure override**:
-A manual closure entered for emergencies or holidays, with an optional message, start date, and end date, that takes precedence over the normal weekly hours.
-_Avoid_: Manual toggle
+**Closure**:
+A day or range of days the shop will not open, with a reason, entered by hand for emergencies, holidays, or any planned closure. A closure takes precedence over the normal weekly hours. It starts and ends on its listed dates, and a closure with no end date stays in effect until removed.
+_Avoid_: Override, manual toggle
+
+**Upcoming closures notice**:
+The strip under the status banner that lists closures that have not ended and start within the next 14 days, each with its day and reason. It still lists a closure on the day it happens, so customers who see it late know why the shop is closed.
 
 **Customer**:
 A person bringing containers to be redeemed.

@@ -32,6 +32,13 @@ a:focus-visible, button:focus-visible { outline: 3px solid var(--link); outline-
 .status-message { margin: .75rem 0 0; font-size: 1.35rem; font-weight: 700; line-height: 1.25; }
 .status-note { margin: .5rem 0 0; font-size: 1.15rem; }
 
+.closures { background: var(--panel); border-bottom: 1px solid var(--line); }
+.closures-inner { max-width: 42rem; margin: 0 auto; padding: 1rem 1.25rem; border-left: 8px solid var(--closed); }
+.closures h2 { margin: 0 0 .5rem; font-size: 1.15rem; }
+.closures ul { margin: 0; padding: 0; list-style: none; }
+.closures li { margin: 0 0 .5rem; font-size: 1.1rem; }
+.closures li:last-child { margin: 0; }
+
 .notice { background: var(--notice); color: var(--notice-ink); padding: .75rem 1.25rem; font-weight: 600; }
 .notice p { max-width: 42rem; margin: 0 auto; }
 
@@ -75,6 +82,12 @@ footer p { margin: 0 0 .35rem; }
   </div>
 </header>
 <div class="notice" id="placeholder-notice" hidden><p>The hours shown here are placeholders. Check Google for the shop’s current hours.</p></div>
+<aside class="closures" id="closures" aria-labelledby="closures-h" hidden>
+  <div class="closures-inner">
+    <h2 id="closures-h">Upcoming closures</h2>
+    <ul id="closures-list"></ul>
+  </div>
+</aside>
 
 <main>
   <section aria-labelledby="visit-h">
@@ -174,6 +187,18 @@ footer p { margin: 0 0 .35rem; }
     msg.textContent = s.message;
     msg.hidden = !s.message;
     $("status-note").textContent = s.note;
+    var upcoming = S.upcomingClosures(d, new Date());
+    var list = $("closures-list");
+    list.textContent = "";
+    upcoming.forEach(function (c) {
+      var li = document.createElement("li");
+      var strong = document.createElement("strong");
+      strong.textContent = c.label + ":";
+      li.appendChild(strong);
+      li.appendChild(document.createTextNode(" " + c.message));
+      list.appendChild(li);
+    });
+    $("closures").hidden = upcoming.length === 0;
     var today = S.shopNow(new Date(), d.timeZone).dayIndex;
     rows.forEach(function (tr) {
       tr.className = Number(tr.getAttribute("data-day")) === today ? "today" : "";
