@@ -26,6 +26,9 @@ _Avoid_: Override, manual toggle
 **Early close**:
 A day the shop opens as usual but closes at a set time, such as a half day. It is entered as a closure with an "open until" time. It can only shorten a day, never extend the normal hours, and in a range of days it applies to every day.
 
+**Closing soon**:
+The last 15 minutes before the shop's closing time, while it is still open. The closing time is the earlier of the normal hours and any early close. The banner turns orange and says "Closing Soon".
+
 **Upcoming closures notice**:
 The strip under the status banner that lists closures that have not ended and start within the next 14 days, each with its day and reason. It still lists a closure on the day it happens, so customers who see it late know why the shop is closed.
 

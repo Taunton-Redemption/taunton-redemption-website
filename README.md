@@ -26,6 +26,9 @@ In `site-data.js`, add one entry per closure to the `closures` list (dates are Y
 - For a half day, add `openUntil` (24-hour time): `{ start: "2026-11-25", end: "2026-11-25", openUntil: "12:30", message: "Half day before Thanksgiving" }`. The shop shows Open until that time, then Closed. It can only shorten a day, never extend the normal hours.
 - Commit the change. The site updates in a minute or two.
 
+## Closing soon banner
+In the last 15 minutes before closing, the banner turns orange and says "Closing Soon". It uses the earlier of the normal closing time and any early close. To change the number of minutes, set `closingSoonMinutes` in `site-data.js`. Set it to `0` to turn the orange banner off. If the line is missing, it is 15.
+
 ## Publishing on GitHub Pages
 1. Create the repo under the client’s account, named `<username>.github.io`.
 2. Add these files to the repo root and commit to `main`.

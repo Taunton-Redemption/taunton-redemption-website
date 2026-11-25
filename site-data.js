@@ -48,11 +48,8 @@ const SITE_DATA = {
 
   // How many days ahead customers see an upcoming closure.
   closureNoticeDays: 14,
-
-  /*
-  TODO: Half days
-
-  */
+  // Minutes before closing when the banner turns orange and says "Closing Soon". 0 turns it off.
+  closingSoonMinutes: 15,
 
   // Deposit rules.
   depositCents: 5,

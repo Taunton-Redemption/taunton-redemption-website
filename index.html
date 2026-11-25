@@ -8,13 +8,13 @@
 <style>
 :root {
   --bg: #eef1ee; --ink: #15201a; --muted: #4d5a52; --line: #c9d1cb; --panel: #ffffff;
-  --open: #14683c; --closed: #a02820; --notice: #fff3cd; --notice-ink: #5b4300; --link: #0b5a8f;
+  --open: #14683c; --closed: #a02820; --soon: #b45309; --notice: #fff3cd; --notice-ink: #5b4300; --link: #0b5a8f;
   --yes: #14683c; --no: #6b3a36;
 }
 @media (prefers-color-scheme: dark) {
   :root {
     --bg: #101612; --ink: #e8efe9; --muted: #aab8ae; --line: #2c3a31; --panel: #18211b;
-    --open: #1f8a52; --closed: #c23a31; --notice: #3b3114; --notice-ink: #f3dc9a; --link: #7cc0f0;
+    --open: #1f8a52; --closed: #c23a31; --soon: #b45309; --notice: #3b3114; --notice-ink: #f3dc9a; --link: #7cc0f0;
     --yes: #5fd08e; --no: #e59a93;
   }
 }
@@ -26,6 +26,8 @@ a:focus-visible, button:focus-visible { outline: 3px solid var(--link); outline-
 
 .status { color: #fff; padding: 1.5rem 1.25rem 2rem; background: var(--closed); }
 .status[data-state="open"] { background: var(--open); }
+.status[data-state="closing-soon"] { background: var(--soon); }
+.status[data-state="closing-soon"] .status-word { font-size: clamp(2.5rem, 12.5vw, 5.5rem); line-height: 1.05; }
 .status-inner, main, footer { max-width: 42rem; margin: 0 auto; }
 .status h1 { margin: 0; font-size: 1.05rem; font-weight: 600; opacity: .92; }
 .status-word { margin: .25rem 0 0; font-size: clamp(4rem, 24vw, 8rem); line-height: .95; font-weight: 800; letter-spacing: -.03em; }
@@ -182,7 +184,7 @@ footer p { margin: 0 0 .35rem; }
     var s = S.computeStatus(d, new Date());
     var box = $("status");
     box.setAttribute("data-state", s.state);
-    $("status-word").textContent = s.state === "open" ? "Open" : "Closed";
+    $("status-word").textContent = s.state === "open" ? "Open" : s.state === "closing-soon" ? "Closing Soon" : "Closed";
     var msg = $("status-message");
     msg.textContent = s.message;
     msg.hidden = !s.message;

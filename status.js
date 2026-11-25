@@ -109,8 +109,13 @@
     var message = c ? c.message || "" : "";
     var ranges = rangesFor(data, n.date, n.dayIndex);
     for (var i = 0; i < ranges.length; i++) {
-      if (n.minutes >= toMinutes(ranges[i][0]) && n.minutes < toMinutes(ranges[i][1])) {
-        return { state: "open", closure: !!c, message: message, note: "Open until " + formatTime(ranges[i][1]) + " today" };
+      var close = toMinutes(ranges[i][1]);
+      if (n.minutes >= toMinutes(ranges[i][0]) && n.minutes < close) {
+        // "Closing soon" for the last closingSoonMinutes (15 if not set) before the closing time.
+        // The closing time here is already the earlier of the normal hours and any early close.
+        var soon = data.closingSoonMinutes === undefined ? 15 : data.closingSoonMinutes;
+        var closingSoon = soon > 0 && close - n.minutes <= soon;
+        return { state: closingSoon ? "closing-soon" : "open", closure: !!c, message: message, note: "Open until " + formatTime(ranges[i][1]) + " today" };
       }
     }
     return { state: "closed", closure: !!c, message: message, note: nextOpening(data, n) };

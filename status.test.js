@@ -194,4 +194,36 @@ test("notice words an early close, with and without a reason", () => {
   const bare = upcomingClosures(withClosures([{ start: "2026-11-25", end: "2026-11-25", openUntil: "12:30" }]), at("2026-11-25T15:00:00Z"));
   assert.strictEqual(bare[0].message, "Closing early at 12:30 PM");
 });
+// Closing soon: the last 15 minutes before the closing time (hours here are 9:00 AM to 5:00 PM).
+test("closing soon: starts 15 minutes before closing", () => {
+  const s = computeStatus(base, at("2026-11-23T21:45:00Z")); // 4:45 PM
+  assert.strictEqual(s.state, "closing-soon");
+  assert.strictEqual(s.note, "Open until 5:00 PM today");
+});
+test("closing soon: not yet at 16 minutes before closing", () => {
+  assert.strictEqual(computeStatus(base, at("2026-11-23T21:44:00Z")).state, "open"); // 4:44 PM
+});
+test("closing soon: still shown in the last minute, then closed", () => {
+  assert.strictEqual(computeStatus(base, at("2026-11-23T21:59:00Z")).state, "closing-soon"); // 4:59 PM
+  assert.strictEqual(computeStatus(base, at("2026-11-23T22:00:00Z")).state, "closed"); // 5:00 PM
+});
+test("closing soon: uses the early close time when it is earlier", () => {
+  const s = computeStatus(withClosures([half]), at("2026-11-25T17:15:00Z")); // 12:15 PM, close 12:30
+  assert.strictEqual(s.state, "closing-soon");
+  assert.strictEqual(s.message, "Half day before Thanksgiving");
+  assert.strictEqual(s.note, "Open until 12:30 PM today");
+  assert.strictEqual(computeStatus(withClosures([half]), at("2026-11-25T17:14:00Z")).state, "open"); // 12:14 PM
+});
+test("closing soon: an early close later than normal hours uses the normal closing time", () => {
+  const late = Object.assign({}, half, { openUntil: "18:00" });
+  assert.strictEqual(computeStatus(withClosures([late]), at("2026-11-25T21:50:00Z")).state, "closing-soon"); // 4:50 PM
+});
+test("closing soon: also before a break in a two-shift day", () => {
+  const split = withClosures([], { hours: Object.assign({}, base.hours, { mon: [["09:00", "12:00"], ["13:00", "17:00"]] }) });
+  assert.strictEqual(computeStatus(split, at("2026-11-23T16:50:00Z")).state, "closing-soon"); // 11:50 AM
+});
+test("closingSoonMinutes changes the window, and 0 turns it off", () => {
+  assert.strictEqual(computeStatus(Object.assign({}, base, { closingSoonMinutes: 30 }), at("2026-11-23T21:30:00Z")).state, "closing-soon"); // 4:30 PM
+  assert.strictEqual(computeStatus(Object.assign({}, base, { closingSoonMinutes: 0 }), at("2026-11-23T21:55:00Z")).state, "open"); // 4:55 PM
+});
 console.log(passed + " tests passed");
