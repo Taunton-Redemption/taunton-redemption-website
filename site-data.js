@@ -39,16 +39,19 @@ const SITE_DATA = {
   //   by itself after its last day. The shop reopens by itself after it, too.
   // Example for a range: { start: "2026-12-01", end: "2026-12-02", message: "Closed for inventory" },
   closures: [
+    // { message: "Closed for 1" },
+    // { start: "2026-11-38", message: "Closed for 2" },
+    // { end: "2026-11-37", message: "Closed for 3" },
     { start: "2026-11-26", end: "2026-11-26", message: "Closed for Thanksgiving" },
   ],
 
   // How many days ahead customers see an upcoming closure.
   closureNoticeDays: 14,
 
+  /*
+  TODO: Half days
 
-
-  // TODO: SHOW EXACT DAY WHEN OPEN AGAIN WITH TIME
-  // TODO: maybe let people know to try to get in before 2:45 since we start cleaning and leave by then?
+  */
 
   // Deposit rules.
   depositCents: 5,
@@ -68,14 +71,13 @@ const SITE_DATA = {
     "Sports drinks (Gatorade, Powerade)",
     "Wine bottles",
     "Liquor bottles and nips",
-    "High Noon, Sun Cruiser, Surfside, Arizona (Non-spiked)"
+    "High Noon, Sun Cruiser, Surfside, Arizona (Non-spiked), Superlyte, Spiked"
   ],
 
   // Shop rules, in the order they appear. {cents} is replaced by depositCents.
   rules: [
-    "We pay {cents}¢ for every deposit container.",
     "Loose glass bottles of alcoholic drinks: limit of 25 per day. We turn away any beyond 25.",
-    "Glass bottles still in their original box have no limit.",
+    "Glass bottles still in their original box/packs have no limit. (6, 12, 18, 24, etc.)",
     "Keep loose bottles separate from cans and plastic.",
     "Cans and plastic can share a bag, but separate bags are appreciated.",
     "Keep trash out of your bags. A bag with a lot of trash will be refused."
