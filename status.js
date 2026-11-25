@@ -20,6 +20,11 @@
     return h12 + ":" + (mm < 10 ? "0" : "") + mm + " " + suffix;
   }
 
+  function toHHMM(m) {
+    var h = Math.floor(m / 60), mm = m % 60;
+    return (h < 10 ? "0" : "") + h + ":" + (mm < 10 ? "0" : "") + mm;
+  }
+
   // Current day, date (YYYY-MM-DD) and minutes since midnight in the shop's time zone.
   function shopNow(date, tz) {
     var parts = new Intl.DateTimeFormat("en-US", {
@@ -68,12 +73,27 @@
     return null;
   }
 
-  // Describes the next time the shop opens, skipping days covered by a closure.
+  // The hours the shop is open on a date. A closure with no "openUntil" closes the whole day.
+  // A closure with "openUntil" (an early close) cuts each range off at that time. It can
+  // shorten a day but never extend it.
+  function rangesFor(data, dateStr, dayIndex) {
+    var ranges = data.hours[KEYS[dayIndex]] || [];
+    var c = findClosure(data, dateStr);
+    if (!c) return ranges;
+    if (!c.openUntil) return [];
+    var cut = toMinutes(c.openUntil), out = [];
+    ranges.forEach(function (r) {
+      var close = Math.min(toMinutes(r[1]), cut);
+      if (close > toMinutes(r[0])) out.push([r[0], toHHMM(close)]);
+    });
+    return out;
+  }
+
+  // Describes the next time the shop opens, skipping days that are closed all day.
   function nextOpening(data, n) {
     for (var k = 0; k <= 7; k++) {
       var d = addDays(n.date, k);
-      if (findClosure(data, d.date)) continue;
-      var ranges = data.hours[KEYS[d.dayIndex]] || [];
+      var ranges = rangesFor(data, d.date, d.dayIndex);
       for (var i = 0; i < ranges.length; i++) {
         if (k === 0 && toMinutes(ranges[i][0]) <= n.minutes) continue;
         var when = k === 0 ? "today" : k === 1 ? "tomorrow" : NAMES[d.dayIndex];
@@ -86,16 +106,14 @@
   function computeStatus(data, now) {
     var n = shopNow(now || new Date(), data.timeZone);
     var c = findClosure(data, n.date);
-    if (c) {
-      return { state: "closed", closure: true, message: c.message || "", note: nextOpening(data, n) };
-    }
-    var ranges = data.hours[KEYS[n.dayIndex]] || [];
+    var message = c ? c.message || "" : "";
+    var ranges = rangesFor(data, n.date, n.dayIndex);
     for (var i = 0; i < ranges.length; i++) {
       if (n.minutes >= toMinutes(ranges[i][0]) && n.minutes < toMinutes(ranges[i][1])) {
-        return { state: "open", closure: false, message: "", note: "Open until " + formatTime(ranges[i][1]) + " today" };
+        return { state: "open", closure: !!c, message: message, note: "Open until " + formatTime(ranges[i][1]) + " today" };
       }
     }
-    return { state: "closed", closure: false, message: "", note: nextOpening(data, n) };
+    return { state: "closed", closure: !!c, message: message, note: nextOpening(data, n) };
   }
 
   function closureLabel(c) {
@@ -117,7 +135,10 @@
       return x < y ? -1 : x > y ? 1 : 0;
     });
     return shown.map(function (c) {
-      return { label: closureLabel(c), message: c.message || "Closed" };
+      var text = c.openUntil
+        ? "Closing early at " + formatTime(c.openUntil) + (c.message ? ". " + c.message : "")
+        : c.message || "Closed";
+      return { label: closureLabel(c), message: text };
     });
   }
 

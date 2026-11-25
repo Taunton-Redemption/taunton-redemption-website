@@ -143,4 +143,55 @@ test("closureNoticeDays changes the window", () => {
   const far = [{ message: "Inventory", start: "2026-12-07", end: "2026-12-07" }];
   assert.strictEqual(upcomingClosures(withClosures(far, { closureNoticeDays: 30 }), at("2026-11-22T15:00:00Z")).length, 1);
 });
+// Early close ("openUntil"): 2026-11-25 is a Wednesday; hours are 9:00 AM to 5:00 PM.
+const half = { message: "Half day before Thanksgiving", start: "2026-11-25", end: "2026-11-25", openUntil: "12:30" };
+test("early close: still open before the cutoff, with the reason", () => {
+  const s = computeStatus(withClosures([half]), at("2026-11-25T15:00:00Z")); // 10:00 AM
+  assert.strictEqual(s.state, "open");
+  assert.strictEqual(s.message, "Half day before Thanksgiving");
+  assert.strictEqual(s.note, "Open until 12:30 PM today");
+});
+test("early close: closed after the cutoff, next opening skips Thanksgiving", () => {
+  const d = withClosures([half, { message: "Closed for Thanksgiving", start: "2026-11-26", end: "2026-11-26" }]);
+  const s = computeStatus(d, at("2026-11-25T17:45:00Z")); // 12:45 PM
+  assert.strictEqual(s.state, "closed");
+  assert.strictEqual(s.message, "Half day before Thanksgiving");
+  assert.strictEqual(s.note, "Opens Friday at 9:00 AM");
+});
+test("early close: the cutoff minute itself counts as closed", () => {
+  const s = computeStatus(withClosures([half]), at("2026-11-25T17:30:00Z")); // 12:30 PM
+  assert.strictEqual(s.state, "closed");
+});
+test("early close: before opening, opens today", () => {
+  const s = computeStatus(withClosures([half]), at("2026-11-25T12:00:00Z")); // 7:00 AM
+  assert.strictEqual(s.state, "closed");
+  assert.strictEqual(s.note, "Opens today at 9:00 AM");
+});
+test("early close cannot extend normal hours", () => {
+  const late = Object.assign({}, half, { openUntil: "18:00" });
+  const s = computeStatus(withClosures([late]), at("2026-11-25T22:30:00Z")); // 5:30 PM
+  assert.strictEqual(s.state, "closed");
+});
+test("early close before opening time closes the whole day", () => {
+  const early = Object.assign({}, half, { openUntil: "08:00" });
+  const s = computeStatus(withClosures([early]), at("2026-11-25T15:00:00Z"));
+  assert.strictEqual(s.state, "closed");
+  assert.strictEqual(s.note, "Opens tomorrow at 9:00 AM");
+});
+test("next opening counts an early-close day as a day the shop opens", () => {
+  const s = computeStatus(withClosures([half]), at("2026-11-24T23:00:00Z")); // Tue 6:00 PM
+  assert.strictEqual(s.note, "Opens tomorrow at 9:00 AM");
+});
+test("early close in a range applies to every day", () => {
+  const range = { message: "Short days", start: "2026-11-25", end: "2026-11-26", openUntil: "12:30" };
+  const s = computeStatus(withClosures([range]), at("2026-11-26T15:00:00Z")); // Thu 10:00 AM
+  assert.strictEqual(s.state, "open");
+  assert.strictEqual(s.note, "Open until 12:30 PM today");
+});
+test("notice words an early close, with and without a reason", () => {
+  const u = upcomingClosures(withClosures([half]), at("2026-11-25T15:00:00Z"));
+  assert.deepStrictEqual(u, [{ label: "Wednesday, November 25", message: "Closing early at 12:30 PM. Half day before Thanksgiving" }]);
+  const bare = upcomingClosures(withClosures([{ start: "2026-11-25", end: "2026-11-25", openUntil: "12:30" }]), at("2026-11-25T15:00:00Z"));
+  assert.strictEqual(bare[0].message, "Closing early at 12:30 PM");
+});
 console.log(passed + " tests passed");

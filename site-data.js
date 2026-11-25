@@ -42,6 +42,7 @@ const SITE_DATA = {
     // { message: "Closed for 1" },
     // { start: "2026-11-38", message: "Closed for 2" },
     // { end: "2026-11-37", message: "Closed for 3" },
+    // { start: "2026-11-25", end: "2026-11-25", openUntil: "12:30", message: "Half day before Thanksgiving" },
     { start: "2026-11-26", end: "2026-11-26", message: "Closed for Thanksgiving" },
   ],
 

@@ -23,6 +23,7 @@ In `site-data.js`, add one entry per closure to the `closures` list (dates are Y
 - A closure shows in the "Upcoming closures" strip from 14 days before it starts (change `closureNoticeDays` to adjust) until its last day is over, then it disappears by itself. You can leave old entries in or delete them.
 - On the closure days, the banner says "Closed" with the message, and the shop reopens by itself afterward.
 - For an emergency today, add `{ message: "Closed today: power outage", start: "2026-11-27", end: "2026-11-27" }`. With no `end`, the shop stays closed until you remove the entry.
+- For a half day, add `openUntil` (24-hour time): `{ start: "2026-11-25", end: "2026-11-25", openUntil: "12:30", message: "Half day before Thanksgiving" }`. The shop shows Open until that time, then Closed. It can only shorten a day, never extend the normal hours.
 - Commit the change. The site updates in a minute or two.
 
 ## Publishing on GitHub Pages
